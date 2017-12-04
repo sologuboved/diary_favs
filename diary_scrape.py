@@ -38,12 +38,16 @@ def dump_json(entries, json_filename):
 
 def json_to_txt(json_filename, txt_filename):
     thread = sorted(load_json(json_filename).items(), key=lambda entry: int(entry[0].split()[0]))
-    with open(txt_filename, 'w') as handler:
+    with open(txt_filename, 'w', encoding='utf-8', newline='\n') as handler:
         for date, post in thread:
-            handler.write(date.encode('utf-8'))
-            handler.write('\n')
-            handler.write(post.encode('utf-8'))
-            handler.write('\n\n\n\n')
+            # handler.write(date.encode('utf-8'))
+            handler.write(date + '\n')
+            # handler.write(u'\n'.encode('utf-8'))
+            # handler.write('\n')
+            # handler.write(post.encode('utf-8'))
+            handler.write(post + '\n\n\n\n' + '')
+            # handler.write(u'\n\n\n\n'.encode('utf-8'))
+            # handler.write('\n\n\n\n')
 
 
 def url_to_num(url):
@@ -63,30 +67,30 @@ def collate_all_urls(diary, thread_nums):
     # collate_all_urls('fandomnaya-pravda', [214133239, 214101823])
     # -->
     # [http://fandomnaya-pravda.diary.ru/p214133239.htm, http://fandomnaya-pravda.diary.ru/p214101823.htm]
-    print "Collating thread urls..."
+    print("Collating thread urls...")
     thread_urls = [num_to_url(diary, thread_num) for thread_num in map(str, thread_nums)]
-    print len(thread_urls), "thread urls collected"
-    print
+    print(len(thread_urls), "thread urls collected")
+    print()
     return thread_urls
 
 
 def scrape_all_urls(initial_url):
     # e.g.:
     # scrape_all_urls('http://fandomnaya-pravda.diary.ru/?tag=91761') collects all urls for posts under this tag
-    print "Scraping thread urls..."
+    print("Scraping thread urls...")
     thread_urls = list()
     span = 0
     while True:
         page_url = initial_url + FROM + str(span)
-        print page_url
+        print(page_url)
         new_urls = scrape_urls_from_page(page_url)
         if new_urls:
             thread_urls.extend(new_urls)
             span += STEP
         else:  # "Нет записей"
             break
-    print len(thread_urls), "thread urls collected"
-    print
+    print(len(thread_urls), "thread urls collected")
+    print()
     return thread_urls
 
 
@@ -95,7 +99,7 @@ def scrape_urls_from_page(page_url):
     # scrape_all_urls('http://fandomnaya-pravda.diary.ru/?tag=91761&from=20') collects all urls for posts from the
     # given page
     page_html = requests.get(page_url).content
-    soup = BeautifulSoup(page_html)
+    soup = BeautifulSoup(page_html, 'html.parser')
     raw_links = soup.find_all('div', {'class': 'postLinksBackg'})
     return [raw_link.find('span', {'class': 'urlLink'}).find('a').get('href') for raw_link in raw_links]
 
@@ -105,18 +109,18 @@ def dump_thread(thread, folder_prefix, filename_index):
     json_filename = filename + '.json'
     txt_filename = filename + '.txt'
 
-    print "Dumping %s..." % json_filename
+    print("Dumping %s..." % json_filename)
     dump_json(thread, json_filename)
-    print "Dumping %s..." % txt_filename
+    print("Dumping %s..." % txt_filename)
     json_to_txt(json_filename, txt_filename)
-    print
+    print()
 
 
 def scrape_thread(thread_url, thread_index, total):
-    print "Scraping thread %s (%d out of %d)" % (thread_url, thread_index, total)
+    print("Scraping thread %s (%d out of %d)" % (thread_url, thread_index, total))
 
     thread_html = requests.get(thread_url).content
-    soup = BeautifulSoup(thread_html)
+    soup = BeautifulSoup(thread_html, 'html.parser')
 
     for tag_br in soup.find_all('br'):  # keeping paragraphs
         tag_br.replace_with('\n')
@@ -124,7 +128,7 @@ def scrape_thread(thread_url, thread_index, total):
     for tag_a in soup.find_all('a', href=True):  # keeping links
         tag_a.replace_with(tag_a.text + ' ' + '<' + tag_a.get('href') + '>')
 
-    print 'dates:',
+    print('dates:', end=' ')
     dates = list()
     raw_dates = soup.find_all('div', {'class': 'postTitle header'})
     # e.g. "Правда №8432"
@@ -133,17 +137,17 @@ def scrape_thread(thread_url, thread_index, total):
     first_date = soup.find('div', {'id': 'post' + url_to_num(thread_url)}).find('span').text.split(',')[1][1:]
     # e.g. "0 (http://fandomnaya-pravda.diary.ru/p210614015.htm) Правда №8432 - 04 октября 2016"
     dates.append('0' + " (" + thread_url + ") " + title + ' - ' + first_date)
-    print 0,
+    print(0, end=' ')
 
     index = 1
     for date in raw_dates:
         date = date.find('span').text.split()
         dates.append(str(index) + ' ' + date[0] + ' ' + date[2])  # e.g. 2017-11-14 в 17:30 --> "57 2017-11-14 17:30"
-        print index,
+        print(index, end=' ')
         index += 1
-    print
+    print()
 
-    print 'posts:',
+    print('posts:', end=' ')
     posts = list()
     raw_posts = soup.find_all('div', {'class': 'postContent'})
     index = 0
@@ -154,9 +158,9 @@ def scrape_thread(thread_url, thread_index, total):
             posts.append(post)
         else:
             posts.append(u'<some missing media>')
-        print index,
+        print(index, end=' ')
         index += 1
-    print
+    print()
 
     assert len(dates) == len(posts), (len(dates), len(posts))
 
@@ -174,6 +178,7 @@ def process_post(raw_post):
             quotation = '\n\n[[[[' + raw_quotation + ']]]]\n\n'
             clean_post = clean_post.replace(raw_quotation, quotation)
 
+    print(clean_post)
     return clean_post
 
 
@@ -182,8 +187,8 @@ def launch(filename_index, folder_prefix, collate_urls=None, scrape_urls=None):
     # launch(1, FANFICTION, collate_urls=('fandomnaya-pravda', fanfiction))
     # launch(1, CREEPY, scrape_urls='http://fandomnaya-pravda.diary.ru/?tag=127627')
 
-    print folder_prefix.upper()
-    print
+    print(folder_prefix.upper())
+    print()
 
     if collate_urls:
         diary, thread_nums = collate_urls
@@ -191,7 +196,7 @@ def launch(filename_index, folder_prefix, collate_urls=None, scrape_urls=None):
     elif scrape_urls:
         thread_urls = scrape_all_urls(scrape_urls)
     else:
-        print "No urls!"
+        print("No urls!")
         return
 
     thread_index = 1
@@ -204,5 +209,5 @@ def launch(filename_index, folder_prefix, collate_urls=None, scrape_urls=None):
 
 
 if __name__ == '__main__':
-    launch(1, KINKS, scrape_urls=kinks)
+    launch(1, ROLEPLAY, scrape_urls=roleplay)
 
