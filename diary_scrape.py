@@ -202,5 +202,6 @@ def launch(filename_index, folder_prefix, collate_urls=None, scrape_urls=None):
 
 
 if __name__ == '__main__':
-    launch(1, ROLEPLAY, scrape_urls=roleplay)
+    # launch(1, CREEPY, scrape_urls=creepy)
+    launch(24, CREEPY, scrape_urls=perev2)
 
