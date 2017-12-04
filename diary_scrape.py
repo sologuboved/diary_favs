@@ -38,16 +38,10 @@ def dump_json(entries, json_filename):
 
 def json_to_txt(json_filename, txt_filename):
     thread = sorted(load_json(json_filename).items(), key=lambda entry: int(entry[0].split()[0]))
-    with open(txt_filename, 'w', encoding='utf-8', newline='\n') as handler:
+    with open(txt_filename, 'w', encoding='utf-8') as handler:
         for date, post in thread:
-            # handler.write(date.encode('utf-8'))
             handler.write(date + '\n')
-            # handler.write(u'\n'.encode('utf-8'))
-            # handler.write('\n')
-            # handler.write(post.encode('utf-8'))
-            handler.write(post + '\n\n\n\n' + '')
-            # handler.write(u'\n\n\n\n'.encode('utf-8'))
-            # handler.write('\n\n\n\n')
+            handler.write(post + '\n\n\n\n')
 
 
 def url_to_num(url):
@@ -178,7 +172,6 @@ def process_post(raw_post):
             quotation = '\n\n[[[[' + raw_quotation + ']]]]\n\n'
             clean_post = clean_post.replace(raw_quotation, quotation)
 
-    print(clean_post)
     return clean_post
 
 
