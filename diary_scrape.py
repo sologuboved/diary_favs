@@ -3,6 +3,7 @@
 import json
 import re
 import requests
+import html
 from bs4 import BeautifulSoup
 from select_threads import *
 
@@ -110,10 +111,11 @@ def dump_thread(thread, folder_prefix, filename_index):
     print()
 
 
-def scrape_thread(thread_url, thread_index, total):
+def scrape_thread(thread_url, thread_index=1, total=1):
     print("Scraping thread %s (%d out of %d)" % (thread_url, thread_index, total))
 
     thread_html = requests.get(thread_url).content
+    thread_html = thread_html.replace('&'.encode(), '&amp;'.encode())  # otherwise "save&kill, да" --> "save&kill;, да"
     soup = BeautifulSoup(thread_html, 'html.parser')
 
     for tag_br in soup.find_all('br'):  # keeping paragraphs
@@ -165,6 +167,8 @@ def process_post(raw_post):
     raw_post = raw_post.find('div', {'class': 'postInner'}).find('div', {'class': 'paragraph'})
     clean_post = raw_post.find('div').text
 
+    # clean_post = html.unescape(clean_post)  # otherwise >< --> &gt;&lt;
+
     quotations = raw_post.find_all('span', {'class': 'quote_text'})
     if quotations:
         for raw_quotation in quotations:
@@ -202,6 +206,8 @@ def launch(filename_index, folder_prefix, collate_urls=None, scrape_urls=None):
 
 
 if __name__ == '__main__':
+    pass
     # launch(1, CREEPY, scrape_urls=creepy)
-    launch(24, CREEPY, scrape_urls=perev2)
-
+    # launch(21, CREEPY, scrape_urls=perev1)
+    # launch(24, CREEPY, scrape_urls=perev2)
+    # launch(1, O_E, scrape_urls=o_e)
