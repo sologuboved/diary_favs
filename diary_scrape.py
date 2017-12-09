@@ -6,24 +6,8 @@ import requests
 import html
 from bs4 import BeautifulSoup
 from select_threads import *
+from global_vars import *
 
-THREAD = 'thread'
-URL = 'http://%s.diary.ru/p%s.htm'
-F_P = 'fandomnaya-pravda'
-P_C = 'pravdoruboklon'
-FROM = '&from='
-NO_POST = 'no post'
-FOLDER_POSTFIX = '_threads/'
-CREEPY = 'creepy'
-FANFICTION = 'fanfiction'
-SOCIAL = 'social'
-ROLEPLAY = 'roleplay'
-RSYA = 'rsya'
-FEMSLASH = 'femslash'
-O_E = 'o_e'
-SOCIONICS = 'socionics'
-KINKS = 'kinks'
-MISC = 'misc'
 STEP = 20
 
 
@@ -167,7 +151,7 @@ def process_post(raw_post):
     raw_post = raw_post.find('div', {'class': 'postInner'}).find('div', {'class': 'paragraph'})
     clean_post = raw_post.find('div').text
 
-    # clean_post = html.unescape(clean_post)  # otherwise >< --> &gt;&lt;
+    clean_post = html.unescape(clean_post)  # otherwise >< --> &gt;&lt;
 
     quotations = raw_post.find_all('span', {'class': 'quote_text'})
     if quotations:
@@ -210,4 +194,4 @@ if __name__ == '__main__':
     # launch(1, CREEPY, scrape_urls=creepy)
     # launch(21, CREEPY, scrape_urls=perev1)
     # launch(24, CREEPY, scrape_urls=perev2)
-    # launch(1, O_E, scrape_urls=o_e)
+    launch(1, O_E, scrape_urls=o_e)
