@@ -7,7 +7,7 @@ P_C = 'pravdoruboklon'
 FROM = '&from='
 NO_POST = 'no post'
 
-FOLDER_POSTFIX = '_threads/'
+FOLDER_POSTFIX = '_threads'
 CREEPY = 'creepy'
 FANFICTION = 'fanfiction'
 SOCIAL = 'social'
