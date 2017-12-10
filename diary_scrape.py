@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import json
 import re
 import requests
@@ -84,7 +85,11 @@ def scrape_urls_from_page(page_url):
 
 
 def dump_thread(thread, folder_prefix, filename_index):
-    filename = folder_prefix + FOLDER_POSTFIX + THREAD + str(filename_index)  # e.g. 'o_e' + '_threads/' + 'thread' + 1
+    foldername = folder_prefix + FOLDER_POSTFIX
+    if not os.path.exists(foldername):
+        os.makedirs(foldername)
+
+    filename = foldername + '/' + THREAD + str(filename_index)  # e.g. 'o_e' + '_threads/' + 'thread' + 1
     json_filename = filename + '.json'
     txt_filename = filename + '.txt'
 
@@ -108,6 +113,8 @@ def scrape_thread(thread_url, thread_index=1, total=1):
     for tag_a in soup.find_all('a', href=True):  # keeping links
         tag_a.replace_with(tag_a.text + ' ' + '<' + tag_a.get('href') + '>')
 
+    print(soup)
+
     print('dates:', end=' ')
     dates = list()
     raw_dates = soup.find_all('div', {'class': 'postTitle header'})
@@ -130,6 +137,7 @@ def scrape_thread(thread_url, thread_index=1, total=1):
     print('posts:', end=' ')
     posts = list()
     raw_posts = soup.find_all('div', {'class': 'postContent'})
+    # print(raw_posts)
     index = 0
 
     for raw_post in raw_posts:
@@ -149,16 +157,18 @@ def scrape_thread(thread_url, thread_index=1, total=1):
 
 def process_post(raw_post):
     raw_post = raw_post.find('div', {'class': 'postInner'}).find('div', {'class': 'paragraph'})
-    clean_post = raw_post.find('div').text
 
-    clean_post = html.unescape(clean_post)  # otherwise >< --> &gt;&lt;
+    clean_post = raw_post.find('div').text
 
     quotations = raw_post.find_all('span', {'class': 'quote_text'})
     if quotations:
         for raw_quotation in quotations:
             raw_quotation = raw_quotation.text
-            quotation = '\n\n[[[[' + raw_quotation + ']]]]\n\n'
-            clean_post = clean_post.replace(raw_quotation, quotation)
+            clean_quotation = '\n\n[[[[' + raw_quotation + ']]]]\n\n'
+            clean_post = clean_post.replace(raw_quotation, clean_quotation)
+
+    clean_post = html.unescape(clean_post)  # otherwise >< --> &gt;&lt;
+    clean_post = clean_post.replace('¤', '&curren')  # otherwise /?action=view&current --> /?action=view¤t
 
     return clean_post
 
@@ -167,7 +177,6 @@ def launch(filename_index, folder_prefix, collate_urls=None, scrape_urls=None):
     # e.g.:
     # launch(1, FANFICTION, collate_urls=('fandomnaya-pravda', fanfiction))
     # launch(1, CREEPY, scrape_urls='http://fandomnaya-pravda.diary.ru/?tag=127627')
-
     print(folder_prefix.upper())
     print()
 
@@ -194,4 +203,18 @@ if __name__ == '__main__':
     # launch(1, CREEPY, scrape_urls=creepy)
     # launch(21, CREEPY, scrape_urls=perev1)
     # launch(24, CREEPY, scrape_urls=perev2)
-    launch(1, O_E, scrape_urls=o_e)
+
+    # launch(1, O_E, scrape_urls=o_e)
+
+    # launch(1, RSYA, scrape_urls=rsya1)
+    # launch(7, RSYA, scrape_urls=rsya2)
+
+    # launch(1, ROLEPLAY, scrape_urls=roleplay)
+    #
+    # launch(1, FEMSLASH, scrape_urls=femslash)
+    #
+    # launch(1, KINKS, scrape_urls=kinks)
+    #
+    # launch(1, SOCIONICS, scrape_urls=socionics)
+
+    scrape_thread('http://fandomnaya-pravda.diary.ru/p210590156.htm')
