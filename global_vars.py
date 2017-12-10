@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+STEP = 20
+
 THREAD = 'thread'
 URL = 'http://%s.diary.ru/p%s.htm'
 F_P = 'fandomnaya-pravda'
