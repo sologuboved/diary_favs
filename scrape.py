@@ -9,15 +9,13 @@ def scrape_thread(thread_url, thread_index=1, total=1):
 
     thread_html = requests.get(thread_url).content
     thread_html = thread_html.replace('&'.encode(), '&amp;'.encode())  # otherwise "save&kill, да" --> "save&kill;, да"
-    soup = BeautifulSoup(thread_html, 'html.parser')
+    soup = BeautifulSoup(thread_html, 'lxml')
 
     for tag_br in soup.find_all('br'):  # keeping paragraphs
         tag_br.replace_with('\n')
 
     for tag_a in soup.find_all('a', href=True):  # keeping links
         tag_a.replace_with(tag_a.text + ' ' + '<' + tag_a.get('href') + '>')
-
-    print(soup)
 
     print('dates:', end=' ')
     dates = list()
@@ -41,7 +39,6 @@ def scrape_thread(thread_url, thread_index=1, total=1):
     print('posts:', end=' ')
     posts = list()
     raw_posts = soup.find_all('div', {'class': 'postContent'})
-    # print(raw_posts)
     index = 0
 
     for raw_post in raw_posts:
@@ -75,7 +72,3 @@ def process_post(raw_post):
     clean_post = clean_post.replace('¤', '&curren')  # otherwise /?action=view&current --> /?action=view¤t
 
     return clean_post
-
-
-if __name__ == '__main__':
-    pass
