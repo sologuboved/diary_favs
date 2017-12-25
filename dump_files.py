@@ -37,7 +37,3 @@ def dump_thread(thread, folder_prefix, filename_index):
     print("Dumping %s..." % txt_filename)
     json_to_txt(json_filename, txt_filename)
     print()
-
-
-if __name__ == '__main__':
-    pass

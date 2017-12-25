@@ -58,7 +58,3 @@ def scrape_urls_from_page(page_url):
     soup = BeautifulSoup(page_html, 'html.parser')
     raw_links = soup.find_all('div', {'class': 'postLinksBackg'})
     return [raw_link.find('span', {'class': 'urlLink'}).find('a').get('href') for raw_link in raw_links]
-
-
-if __name__ == '__main__':
-    pass
