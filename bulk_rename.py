@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# C:/Users/vesna/Documents/Werecoder/diary_favs_py3/o_e_threads2/thread1.txt
-
 import os
 
 
