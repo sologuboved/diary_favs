@@ -12,28 +12,22 @@ def compare(folder_prefix):
         try:
             with open(filename1, encoding='utf-8') as handler1, open(filename2, encoding='utf-8') as handler2:
                 print(filename1, filename2, end=' ')
-                for line1, line2 in zip(handler1.readlines(), handler2.readlines()):
-                    # print()
-                    # print()
-                    # print(1, line1)
-                    # print(2, line2)
-                    if line1 != line2:
-                        # print("NOOOOOOOOOOOO")
-                        print()
-                        print(line1)
-                        print(line2)
-                        print()
-                        print()
-                        # for ind in range(len(line2)):
-                        #     if line1[ind] != line2[ind]:
-                        #         print(line1[ind])
-                        #         print(line2[ind])
-                        #         print(len(line1))
-                        #         print(len(line2))
-                        # print(len(line2))
-                        break
+                file1 = handler1.readlines()
+                file2 = handler2.readlines()
+                zipped = zip(file1, file2)
+                if (not len(list(zipped))) and (file1 or file2):
+                    print("One of the files is empty")
                 else:
-                    print('ok')
+                    for line1, line2 in zip(file1, file2):
+                        if line1 != line2:
+                            print()
+                            print(line1)
+                            print(line2)
+                            print()
+                            print()
+                            break
+                    else:
+                        print('ok')
         except FileNotFoundError:
             break
         print()
@@ -42,13 +36,3 @@ def compare(folder_prefix):
 
 if __name__ == '__main__':
     pass
-    # compare(CREEPY)
-    # compare(O_E)
-    compare(RSYA)
-    # i = 1
-    # with open(O_E + FOLDER_POSTFIX + '/' + THREAD + str(11) + '.txt', encoding='utf-8') as h:
-    #     for line in h.readlines():
-    #         print(i, line)
-    #         i += 1
-
-
