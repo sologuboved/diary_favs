@@ -5,6 +5,21 @@
 import os
 
 
+def shift_indices(foldername, new_final, step):
+    ind = new_final
+    while ind > step:
+        txt_old_filename = foldername + '/' + 'thread%d_old.txt' % (ind - step)
+        json_old_filename = foldername + '/' + 'thread%d_old.json' % (ind - step)
+        txt_new_filename = foldername + '/' + 'thread%d_old.txt' % ind
+        json_new_filename = foldername + '/' + 'thread%d_old.json' % ind
+        print(txt_old_filename, txt_new_filename)
+
+        os.rename(txt_old_filename, txt_new_filename)
+        os.rename(json_old_filename, json_new_filename)
+
+        ind -= 1
+
+
 def rename_files():
     for foldername in os.listdir('.'):
         if '.' not in foldername and '__' not in foldername and '_old' in foldername:
@@ -24,6 +39,5 @@ def rename_directories():
 
 
 if __name__ == '__main__':
-    # rename_directories()
-    # rename_files()
+    # shift_indices('kinks_threads_old', 22, 1)
     pass
